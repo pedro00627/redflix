@@ -9,8 +9,11 @@ import edu.misiontic2022.redflix.RedflixApplication;
 import edu.misiontic2022.redflix.SpringContext;
 import edu.misiontic2022.redflix.model.Usuario;
 import edu.misiontic2022.redflix.repositorio.UsuarioRepositorio;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -55,8 +58,9 @@ public class VistaUsuario extends javax.swing.JFrame {
         jLabelFechaDeNacimiento = new javax.swing.JLabel();
         jTextFieldFechaDeNacimiento = new javax.swing.JTextField();
         jLabelUsuario = new javax.swing.JLabel();
-        jButtonConsultarUsuario = new javax.swing.JButton();
+        jButtonGuardarUsuario = new javax.swing.JButton();
         jLabelResultadoUsuario = new javax.swing.JLabel();
+        jButtonEliminarUsuario = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,6 +68,11 @@ public class VistaUsuario extends javax.swing.JFrame {
         jLabelId.setText("ID: ");
 
         jTextFieldId.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        jTextFieldId.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextFieldIdFocusLost(evt);
+            }
+        });
         jTextFieldId.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldIdActionPerformed(evt);
@@ -110,10 +119,18 @@ public class VistaUsuario extends javax.swing.JFrame {
         jLabelUsuario.setText("USUARIO");
         jLabelUsuario.setToolTipText("");
 
-        jButtonConsultarUsuario.setText("Consultar");
-        jButtonConsultarUsuario.addActionListener(new java.awt.event.ActionListener() {
+        jButtonGuardarUsuario.setText("Guardar");
+        jButtonGuardarUsuario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonConsultarUsuarioActionPerformed(evt);
+                jButtonGuardarUsuarioActionPerformed(evt);
+            }
+        });
+
+        jButtonEliminarUsuario.setText("Eliminar");
+        jButtonEliminarUsuario.setEnabled(false);
+        jButtonEliminarUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEliminarUsuarioActionPerformed(evt);
             }
         });
 
@@ -127,7 +144,10 @@ public class VistaUsuario extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jLabelResultadoUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButtonConsultarUsuario)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jButtonGuardarUsuario)
+                            .addGap(18, 18, 18)
+                            .addComponent(jButtonEliminarUsuario))
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabelAlias, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -188,7 +208,9 @@ public class VistaUsuario extends javax.swing.JFrame {
                     .addComponent(jLabelFechaDeNacimiento)
                     .addComponent(jTextFieldFechaDeNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(29, 29, 29)
-                .addComponent(jButtonConsultarUsuario)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonGuardarUsuario)
+                    .addComponent(jButtonEliminarUsuario))
                 .addGap(18, 18, 18)
                 .addComponent(jLabelResultadoUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(40, Short.MAX_VALUE))
@@ -201,22 +223,68 @@ public class VistaUsuario extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldIdActionPerformed
 
-    private void jButtonConsultarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConsultarUsuarioActionPerformed
+    private void jButtonGuardarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarUsuarioActionPerformed
         // TODO add your handling code here:
-        Optional<Usuario> usuarioOpcional = usuarioRepositorio.findById(Integer.parseInt(jTextFieldId.getText()));
-        if (usuarioOpcional.isPresent()) {
-            Usuario usuario  = usuarioOpcional.get();
-            jTextFieldId.setText(Integer.toString(usuario.getUsuarioId()));
-            jTextFieldNombre.setText(usuario.getNombre());
-            jTextFieldApellido.setText(usuario.getApellido());
-            jTextFieldEmail.setText(usuario.getEmail());
-            jTextFieldCelular.setText(Long.toString(usuario.getCelular()));
-            jTextFieldAlias.setText(usuario.getnAlias());
-            jTextFieldContrasena.setText(usuario.getContrasena());
-            jTextFieldFechaDeNacimiento.setText(new SimpleDateFormat("dd/MM/yyyy").format(usuario.getFechaNacimiento()));
-            jLabelResultadoUsuario.setText("");
-        } else {
-            jTextFieldId.setText("");
+        Usuario usuario = new Usuario();
+        usuario.setUsuarioId(Integer.parseInt(jTextFieldId.getText()));
+        usuario.setNombre(jTextFieldNombre.getText());
+        usuario.setApellido(jTextFieldApellido.getText());
+        usuario.setEmail(jTextFieldEmail.getText());
+        usuario.setCelular(Long.parseLong(jTextFieldCelular.getText()));
+        usuario.setnAlias(jTextFieldAlias.getText());
+        usuario.setContrasena(jTextFieldContrasena.getText());
+        usuario.setFechaNacimiento(Timestamp.valueOf(jTextFieldFechaDeNacimiento.getText()));
+        try {
+            usuarioRepositorio.save(usuario);
+            jLabelResultadoUsuario.setText("El usuario se guardó correctamente");
+        } catch (Exception e) {
+            jLabelResultadoUsuario.setText(e.toString());
+        }
+
+
+    }//GEN-LAST:event_jButtonGuardarUsuarioActionPerformed
+
+    private void jTextFieldIdFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldIdFocusLost
+        // TODO add your handling code here:
+        try {
+            Optional<Usuario> usuarioOpcional = usuarioRepositorio.findById(Integer.parseInt(jTextFieldId.getText()));
+            if (usuarioOpcional.isPresent()) {
+                Usuario usuario = usuarioOpcional.get();
+                //jTextFieldId.setText(Integer.toString(usuario.getUsuarioId()));
+                jTextFieldNombre.setText(usuario.getNombre());
+                jTextFieldApellido.setText(usuario.getApellido());
+                jTextFieldEmail.setText(usuario.getEmail());
+                jTextFieldCelular.setText(Long.toString(usuario.getCelular()));
+                jTextFieldAlias.setText(usuario.getnAlias());
+                jTextFieldContrasena.setText(usuario.getContrasena());
+                jTextFieldFechaDeNacimiento.setText(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(usuario.getFechaNacimiento()));
+                jLabelResultadoUsuario.setText("");
+                jButtonGuardarUsuario.setText("Actualizar");
+                jButtonEliminarUsuario.setEnabled(true);
+            } else {
+                //jTextFieldId.setText("");
+                jTextFieldNombre.setText("");
+                jTextFieldApellido.setText("");
+                jTextFieldEmail.setText("");
+                jTextFieldCelular.setText("");
+                jTextFieldAlias.setText("");
+                jTextFieldContrasena.setText("");
+                jTextFieldFechaDeNacimiento.setText("");
+                jLabelResultadoUsuario.setText("Lo sentimos el usuario no se encuentra disponible");
+                jButtonGuardarUsuario.setText("Crear");
+                jButtonEliminarUsuario.setEnabled(false);
+                System.out.println("Lo sentimos el usuario no se encuentra disponiblez");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(new JFrame(), "Error de base de datos");
+            System.out.println("e");
+        }
+    }//GEN-LAST:event_jTextFieldIdFocusLost
+
+    private void jButtonEliminarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminarUsuarioActionPerformed
+        // TODO add your handling code here:
+        try {
+            usuarioRepositorio.deleteById(Integer.parseInt(jTextFieldId.getText()));
             jTextFieldNombre.setText("");
             jTextFieldApellido.setText("");
             jTextFieldEmail.setText("");
@@ -224,10 +292,15 @@ public class VistaUsuario extends javax.swing.JFrame {
             jTextFieldAlias.setText("");
             jTextFieldContrasena.setText("");
             jTextFieldFechaDeNacimiento.setText("");
-            jLabelResultadoUsuario.setText("Lo sentimos el usuario no se encuentra disponible");
+            jLabelResultadoUsuario.setText("El usuario se borró correctamente");
+            jButtonGuardarUsuario.setText("Crear");
+            jButtonEliminarUsuario.setEnabled(false);
             System.out.println("Lo sentimos el usuario no se encuentra disponiblez");
+
+        } catch (Exception e) {
         }
-    }//GEN-LAST:event_jButtonConsultarUsuarioActionPerformed
+
+    }//GEN-LAST:event_jButtonEliminarUsuarioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -265,7 +338,8 @@ public class VistaUsuario extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonConsultarUsuario;
+    private javax.swing.JButton jButtonEliminarUsuario;
+    private javax.swing.JButton jButtonGuardarUsuario;
     private javax.swing.JLabel jLabelAlias;
     private javax.swing.JLabel jLabelApellido;
     private javax.swing.JLabel jLabelCelular;

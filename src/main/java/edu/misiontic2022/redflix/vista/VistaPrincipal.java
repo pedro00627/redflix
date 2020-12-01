@@ -65,6 +65,11 @@ public class VistaPrincipal extends javax.swing.JFrame {
         });
 
         jButtonSalir.setLabel("Salir");
+        jButtonSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSalirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,7 +115,6 @@ public class VistaPrincipal extends javax.swing.JFrame {
 
     private void jButtonPeliculasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPeliculasActionPerformed
         // TODO add your handling code here:
-
         new VistaPelicula().setVisible(true);
         this.dispose();
 
@@ -122,6 +126,11 @@ public class VistaPrincipal extends javax.swing.JFrame {
         new VistaSerie().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButtonSeriesActionPerformed
+
+    private void jButtonSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalirActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_jButtonSalirActionPerformed
 
     /**
      * @param args the command line arguments
